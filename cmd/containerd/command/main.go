@@ -176,7 +176,7 @@ can be used and modified as necessary as a custom configuration.`
 		log.G(ctx).WithFields(log.Fields{
 			"version":  version.Version,
 			"revision": version.Revision,
-		}).Info("starting custom build of containerd")
+		}).Debug("starting custom build of containerd")
 
 		type srvResp struct {
 			s   *server.Server
