@@ -62,7 +62,7 @@ func (c *criService) RunPodSandbox(ctx context.Context, r *runtime.RunPodSandbox
 		return nil, errors.New("sandbox config must include metadata")
 	}
 	name := makeSandboxName(metadata)
-	log.G(ctx).WithField("podsandboxid", id).Debugf("generated id for sandbox name %q", name)
+	log.G(ctx).WithField("podsandboxid", id).Debugf("RJ containerd - generated id for sandbox name %q", name)
 
 	// cleanupErr records the last error returned by the critical cleanup operations in deferred functions,
 	// like CNI teardown and stopping the running sandbox task.
