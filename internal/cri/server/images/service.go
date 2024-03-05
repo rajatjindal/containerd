@@ -126,29 +126,46 @@ func NewService(config criconfig.ImageConfig, options *CRIImageServiceOptions) (
 func (c *CRIImageService) LocalResolve(refOrID string) (imagestore.Image, error) {
 	getImageID := func(refOrId string) string {
 		if _, err := imagedigest.Parse(refOrID); err == nil {
+			log.L.Infof("returning refid %q", refOrId)
 			return refOrID
 		}
+
+		log.L.Infof("imagedigest.Parse didnt work. doing more work %q", refOrId)
 		return func(ref string) string {
 			// ref is not image id, try to resolve it locally.
 			// TODO(random-liu): Handle this error better for debugging.
 			normalized, err := docker.ParseDockerRef(ref)
 			if err != nil {
+				log.L.Infof("docker.ParseDockerRef returned error %v", err)
 				return ""
 			}
+			log.L.Infof("docker.ParseDockerRef no error %#v", normalized)
 			id, err := c.imageStore.Resolve(normalized.String())
 			if err != nil {
+				log.L.Infof("imagestore.resolve returned error %#v", err)
 				return ""
 			}
+			log.L.Infof("after imagestore.resolve returning id %s", id)
 			return id
 		}(refOrID)
 	}
 
 	imageID := getImageID(refOrID)
+	log.L.Infof("imageId is %q", imageID)
 	if imageID == "" {
 		// Try to treat ref as imageID
 		imageID = refOrID
 	}
-	return c.imageStore.Get(imageID)
+
+	imageX, err := c.imageStore.Get(imageID)
+	if err != nil {
+		log.L.Infof("imagestore.get returned error %v", err)
+		return imagestore.Image{}, err
+	}
+
+	log.L.Infof("imageX is %#v", imageX)
+
+	return imageX, nil
 }
 
 // RuntimeSnapshotter overrides the default snapshotter if Snapshotter is set for this runtime.
