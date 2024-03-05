@@ -17,15 +17,16 @@
 package main
 
 import (
+	"context"
 	"crypto"
 	"fmt"
 	"os"
 
+	_ "github.com/containerd/containerd/cmd/containerd/builtins"
 	"github.com/containerd/containerd/cmd/containerd/command"
+	"github.com/containerd/containerd/log"
 	"github.com/containerd/containerd/pkg/hasher"
 	"github.com/containerd/containerd/pkg/seed" //nolint:staticcheck // Global math/rand seed is deprecated, but still used by external dependencies
-
-	_ "github.com/containerd/containerd/cmd/containerd/builtins"
 )
 
 func init() {
@@ -35,7 +36,7 @@ func init() {
 }
 
 func main() {
-	fmt.Println("inside my containerd")
+	log.G(context.Background()).Debugf("starting custom containerd version")
 	app := command.App()
 	if err := app.Run(os.Args); err != nil {
 		fmt.Fprintf(os.Stderr, "containerd: %s\n", err)
