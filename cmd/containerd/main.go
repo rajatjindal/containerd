@@ -35,6 +35,7 @@ func init() {
 }
 
 func main() {
+	fmt.Println("inside my containerd")
 	app := command.App()
 	if err := app.Run(os.Args); err != nil {
 		fmt.Fprintf(os.Stderr, "containerd: %s\n", err)
