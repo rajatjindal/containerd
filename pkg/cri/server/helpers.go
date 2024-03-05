@@ -165,17 +165,28 @@ func getRepoDigestAndTag(namedRef docker.Named, digest imagedigest.Digest, schem
 func (c *criService) localResolve(refOrID string) (imagestore.Image, error) {
 	getImageID := func(refOrId string) string {
 		if _, err := imagedigest.Parse(refOrID); err == nil {
+			logrus.Infof("returning refid %q", refOrId)
+
 			return refOrID
 		}
+
+		logrus.Infof("imagedigest.Parse didnt work. doing more work %q", refOrId)
+
 		return func(ref string) string {
 			// ref is not image id, try to resolve it locally.
 			// TODO(random-liu): Handle this error better for debugging.
 			normalized, err := docker.ParseDockerRef(ref)
 			if err != nil {
+				logrus.Infof("docker.ParseDockerRef returned error %v", err)
+
 				return ""
 			}
+			logrus.Infof("docker.ParseDockerRef no error %#v", normalized)
+
 			id, err := c.imageStore.Resolve(normalized.String())
 			if err != nil {
+				logrus.Infof("imagestore.resolve returned error %#v", err)
+
 				return ""
 			}
 			return id
@@ -183,11 +194,22 @@ func (c *criService) localResolve(refOrID string) (imagestore.Image, error) {
 	}
 
 	imageID := getImageID(refOrID)
+	logrus.Infof("imageId is %q", imageID)
+
 	if imageID == "" {
 		// Try to treat ref as imageID
 		imageID = refOrID
 	}
-	return c.imageStore.Get(imageID)
+
+	imageX, err := c.imageStore.Get(imageID)
+	if err != nil {
+		logrus.Infof("imagestore.get returned error %v", err)
+		return imagestore.Image{}, err
+	}
+
+	logrus.Infof("imageX is %#v", imageX)
+
+	return imageX, nil
 }
 
 // toContainerdImage converts an image object in image store to containerd image handler.
