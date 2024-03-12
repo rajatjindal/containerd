@@ -412,10 +412,13 @@ func (l *local) List(ctx context.Context, r *api.ListTasksRequest, _ ...grpc.Cal
 	log.G(ctx).WithField("WHERE ARE YOU", "<<< I was here >>>").Info("inside the list func")
 	resp := &api.ListTasksResponse{}
 	for _, r := range l.allRuntimes() {
+		log.G(ctx).WithField("WHERE ARE YOU", "<<< I was here >>>").WithField("Runtime", r.ID()).Info("inside the list func")
 		tasks, err := r.Tasks(ctx, false)
 		if err != nil {
+			log.G(ctx).WithField("WHERE ARE YOU", "<<< I was here >>>").WithField("Runtime", r.ID()).WithError(err).Info("error in Tasks")
 			return nil, errdefs.ToGRPC(err)
 		}
+		log.G(ctx).WithField("WHERE ARE YOU", "<<< I was here >>>").WithField("tasks", len(tasks)).Info("inside the list func tasks")
 		addTasks(ctx, resp, tasks)
 	}
 	return resp, nil
@@ -424,6 +427,7 @@ func (l *local) List(ctx context.Context, r *api.ListTasksRequest, _ ...grpc.Cal
 func addTasks(ctx context.Context, r *api.ListTasksResponse, tasks []runtime.Task) {
 	for _, t := range tasks {
 		tt, err := getProcessState(ctx, t)
+		log.G(ctx).WithField("WHERE ARE YOU", "<<< I was here >>>").WithField("PID", tt.Pid).Info("addTasks pid")
 		if err != nil {
 			if !errdefs.IsNotFound(err) { // handle race with deletion
 				log.G(ctx).WithError(err).WithField("id", t.ID()).Error("converting task to protobuf")
