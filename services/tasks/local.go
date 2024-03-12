@@ -426,6 +426,9 @@ func (l *local) List(ctx context.Context, r *api.ListTasksRequest, _ ...grpc.Cal
 
 func addTasks(ctx context.Context, r *api.ListTasksResponse, tasks []runtime.Task) {
 	for _, t := range tasks {
+		taskinfo := fmt.Sprintf("%#v", t)
+		log.G(ctx).WithField("WHERE ARE YOU", "<<< I was here >>>").WithField("TASK", taskinfo).Info("the task is")
+
 		tt, err := getProcessState(ctx, t)
 		log.G(ctx).WithField("WHERE ARE YOU", "<<< I was here >>>").WithField("PID", tt.Pid).Info("addTasks pid")
 		if err != nil {
