@@ -474,7 +474,7 @@ func (m *TaskManager) Tasks(ctx context.Context, all bool) ([]runtime.Task, erro
 	}
 	out := make([]runtime.Task, len(shims))
 	for i := range shims {
-		log.G(ctx).WithField("shim name", shims[i].ID()).Info("inside TaskManager Tasks")
+		log.G(ctx).WithField("bundledir", shims[i].Bundle()).WithField("client", fmt.Sprintf("%T", shims[i].Client())).Info("inside TaskManager Tasks")
 		newClient, err := newShimTask(shims[i])
 		if err != nil {
 			return nil, err
