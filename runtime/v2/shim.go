@@ -715,6 +715,7 @@ func (s *shimTask) Process(ctx context.Context, id string) (runtime.ExecProcess,
 }
 
 func (s *shimTask) State(ctx context.Context) (runtime.State, error) {
+	log.G(ctx).Info("inside runtime.v2.shim.go")
 	response, err := s.task.State(ctx, &task.StateRequest{
 		ID: s.ID(),
 	})

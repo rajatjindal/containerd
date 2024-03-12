@@ -23,6 +23,7 @@ import (
 	"github.com/containerd/containerd/api/runtime/task/v2"
 	tasktypes "github.com/containerd/containerd/api/types/task"
 	"github.com/containerd/containerd/errdefs"
+	"github.com/containerd/containerd/log"
 	"github.com/containerd/containerd/protobuf"
 	"github.com/containerd/containerd/runtime"
 	"github.com/containerd/ttrpc"
@@ -67,6 +68,7 @@ func statusFromProto(from tasktypes.Status) runtime.Status {
 }
 
 func (p *process) State(ctx context.Context) (runtime.State, error) {
+	log.G(ctx).Info("inside runtime.v2.process.go")
 	response, err := p.shim.task.State(ctx, &task.StateRequest{
 		ID:     p.shim.ID(),
 		ExecID: p.id,

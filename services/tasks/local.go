@@ -363,7 +363,7 @@ func getProcessState(ctx context.Context, p runtime.Process) (*task.Process, err
 		}
 		log.G(ctx).WithError(err).Errorf("get state for %s", p.ID())
 	}
-	log.G(ctx).WithField("pid", p.ID()).WithError(err).Error("get process state for error returning from here %#v", state)
+	log.G(ctx).WithField("pid", p.ID()).WithError(err).Errorf("get process state for error returning from here %#v", state)
 	status := task.Status_UNKNOWN
 	switch state.Status {
 	case runtime.CreatedStatus:

@@ -25,6 +25,7 @@ import (
 	eventstypes "github.com/containerd/containerd/api/events"
 	"github.com/containerd/containerd/api/types/task"
 	"github.com/containerd/containerd/errdefs"
+	"github.com/containerd/containerd/log"
 	"github.com/containerd/containerd/protobuf"
 	"github.com/containerd/containerd/runtime"
 	shim "github.com/containerd/containerd/runtime/v1/shim/v1"
@@ -75,6 +76,7 @@ func statusFromProto(from task.Status) runtime.Status {
 
 // State of process
 func (p *Process) State(ctx context.Context) (runtime.State, error) {
+	log.G(ctx).Info("inside runtime.v1.linux.process.go")
 	// use the container status for the status of the process
 	response, err := p.t.shim.State(ctx, &shim.StateRequest{
 		ID: p.id,

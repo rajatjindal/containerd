@@ -163,6 +163,7 @@ func (t *Task) Start(ctx context.Context) error {
 
 // State returns runtime information for the task
 func (t *Task) State(ctx context.Context) (runtime.State, error) {
+	log.G(ctx).Info("inside runtime.v1.linux.task.go")
 	response, err := t.shim.State(ctx, &shim.StateRequest{
 		ID: t.id,
 	})
