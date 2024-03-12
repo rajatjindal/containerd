@@ -87,7 +87,7 @@ func init() {
 		InitFn:   initFunc,
 	})
 
-	timeout.Set(stateTimeout, 10*time.Second)
+	timeout.Set(stateTimeout, 30*time.Second)
 }
 
 func initFunc(ic *plugin.InitContext) (interface{}, error) {
@@ -350,16 +350,20 @@ func (l *local) DeleteProcess(ctx context.Context, r *api.DeleteProcessRequest, 
 }
 
 func getProcessState(ctx context.Context, p runtime.Process) (*task.Process, error) {
+	log.G(ctx).WithField("pid", p.ID()).Info("get process state for")
 	ctx, cancel := timeout.WithContext(ctx, stateTimeout)
 	defer cancel()
 
 	state, err := p.State(ctx)
 	if err != nil {
+		log.G(ctx).WithField("pid", p.ID()).WithError(err).Error("get process state for error")
 		if errdefs.IsNotFound(err) || errdefs.IsUnavailable(err) {
+			log.G(ctx).WithField("pid", p.ID()).WithError(err).Error("get process state for error returning from here")
 			return nil, err
 		}
 		log.G(ctx).WithError(err).Errorf("get state for %s", p.ID())
 	}
+	log.G(ctx).WithField("pid", p.ID()).WithError(err).Error("get process state for error returning from here %#v", state)
 	status := task.Status_UNKNOWN
 	switch state.Status {
 	case runtime.CreatedStatus:
@@ -409,16 +413,16 @@ func (l *local) Get(ctx context.Context, r *api.GetRequest, _ ...grpc.CallOption
 }
 
 func (l *local) List(ctx context.Context, r *api.ListTasksRequest, _ ...grpc.CallOption) (*api.ListTasksResponse, error) {
-	log.G(ctx).WithField("WHERE ARE YOU", "<<< I was here >>>").Info("inside the list func")
+	log.G(ctx).Info("inside the list func 1")
 	resp := &api.ListTasksResponse{}
 	for _, r := range l.allRuntimes() {
-		log.G(ctx).WithField("WHERE ARE YOU", "<<< I was here >>>").WithField("Runtime", r.ID()).Info("inside the list func")
+		log.G(ctx).WithField("Runtime", r.ID()).Info("inside the list func 2")
 		tasks, err := r.Tasks(ctx, false)
 		if err != nil {
-			log.G(ctx).WithField("WHERE ARE YOU", "<<< I was here >>>").WithField("Runtime", r.ID()).WithError(err).Info("error in Tasks")
+			log.G(ctx).WithField("Runtime", r.ID()).WithError(err).Info("error in Tasks 3")
 			return nil, errdefs.ToGRPC(err)
 		}
-		log.G(ctx).WithField("WHERE ARE YOU", "<<< I was here >>>").WithField("tasks", len(tasks)).Info("inside the list func tasks")
+		log.G(ctx).WithField("tasks", len(tasks)).Info("inside the list func tasks 4")
 		addTasks(ctx, resp, tasks)
 	}
 	return resp, nil
@@ -427,10 +431,10 @@ func (l *local) List(ctx context.Context, r *api.ListTasksRequest, _ ...grpc.Cal
 func addTasks(ctx context.Context, r *api.ListTasksResponse, tasks []runtime.Task) {
 	for _, t := range tasks {
 		taskinfo := fmt.Sprintf("%#v", t)
-		log.G(ctx).WithField("WHERE ARE YOU", "<<< I was here >>>").WithField("TASK", taskinfo).Info("the task is")
+		log.G(ctx).WithField("TASK", taskinfo).Info("the task info is")
 
 		tt, err := getProcessState(ctx, t)
-		log.G(ctx).WithField("WHERE ARE YOU", "<<< I was here >>>").WithField("PID", tt.Pid).Info("addTasks pid")
+		log.G(ctx).WithField("PID", tt.Pid).Info("addTasks pid is")
 		if err != nil {
 			if !errdefs.IsNotFound(err) { // handle race with deletion
 				log.G(ctx).WithError(err).WithField("id", t.ID()).Error("converting task to protobuf")
