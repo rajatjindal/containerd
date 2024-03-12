@@ -87,7 +87,7 @@ func init() {
 		InitFn:   initFunc,
 	})
 
-	timeout.Set(stateTimeout, 2*time.Second)
+	timeout.Set(stateTimeout, 30*time.Second)
 }
 
 func initFunc(ic *plugin.InitContext) (interface{}, error) {
