@@ -350,7 +350,7 @@ func (l *local) DeleteProcess(ctx context.Context, r *api.DeleteProcessRequest, 
 }
 
 func getProcessState(ctx context.Context, p runtime.Process) (*task.Process, error) {
-	log.G(ctx).WithField("pid", p.ID()).Info("get process state for")
+	log.G(ctx).WithField("pid", p.ID()).WithField("ptype", fmt.Sprintf("%T", p)).Info("get process state for")
 	ctx, cancel := timeout.WithContext(ctx, stateTimeout)
 	defer cancel()
 
