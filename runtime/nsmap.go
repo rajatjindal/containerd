@@ -22,6 +22,7 @@ import (
 	"sync"
 
 	"github.com/containerd/containerd/errdefs"
+	"github.com/containerd/containerd/log"
 	"github.com/containerd/containerd/namespaces"
 )
 
@@ -67,6 +68,18 @@ func (m *NSMap[T]) GetAll(ctx context.Context, noNS bool) ([]T, error) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	var o []T
+
+	for ns := range m.objects {
+		log.G(ctx).WithField("Namespace", ns).Info("inside NSMap GetAll")
+
+		for k, t := range m.objects[ns] {
+			ttype := fmt.Sprintf("%T", t)
+			tinfo := fmt.Sprintf("%#v", t)
+			log.G(ctx).WithField("Task Key", k).WithField("Task", tinfo).WithField("TaskType", ttype).Info("inside NSMap GetAll 2 ")
+			o = append(o, t)
+		}
+	}
+
 	if noNS {
 		for ns := range m.objects {
 			for _, t := range m.objects[ns] {
