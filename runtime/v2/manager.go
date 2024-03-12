@@ -467,12 +467,14 @@ func (m *TaskManager) Get(ctx context.Context, id string) (runtime.Task, error) 
 
 // Tasks lists all tasks
 func (m *TaskManager) Tasks(ctx context.Context, all bool) ([]runtime.Task, error) {
+	log.G(ctx).Info("inside TaskManager Tasks")
 	shims, err := m.manager.shims.GetAll(ctx, all)
 	if err != nil {
 		return nil, err
 	}
 	out := make([]runtime.Task, len(shims))
 	for i := range shims {
+		log.G(ctx).WithField("shim name", shims[i].ID()).Info("inside TaskManager Tasks")
 		newClient, err := newShimTask(shims[i])
 		if err != nil {
 			return nil, err
