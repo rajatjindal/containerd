@@ -409,6 +409,7 @@ func (l *local) Get(ctx context.Context, r *api.GetRequest, _ ...grpc.CallOption
 }
 
 func (l *local) List(ctx context.Context, r *api.ListTasksRequest, _ ...grpc.CallOption) (*api.ListTasksResponse, error) {
+	log.G(ctx).WithField("WHERE ARE YOU", "<<< I was here >>>").Info("inside the list func")
 	resp := &api.ListTasksResponse{}
 	for _, r := range l.allRuntimes() {
 		tasks, err := r.Tasks(ctx, false)
